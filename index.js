@@ -39,7 +39,35 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
+
 app.use('/api', routes);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Status page route (for local development and Vercel)
+app.get('/api/status', async (req, res) => {
+    try {
+        const status = await monitoring.getStatus();
+        
+        // If requesting HTML, render the page
+        if (req.headers.accept && req.headers.accept.includes('text/html')) {
+            return res.render('status');
+        }
+        
+        // Otherwise return JSON
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(status);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve status', 
+            message: error.message
+        });
+    }
+});
 
 app.get('/status', (req, res) => {
     res.render('status');
@@ -48,4 +76,5 @@ app.get('/status', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`Status page available at http://localhost:${PORT}/status`);
-}); 
+    console.log(`API Status: http://localhost:${PORT}/api/status`);
+});
