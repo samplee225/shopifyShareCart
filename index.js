@@ -41,18 +41,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use('/api', routes);
 
-app.get('/api/status', async (req, res) => {
-    try {
-        const status = await monitoring.getStatus();
-        res.json(status);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to retrieve status' });
-    }
-});
-
-app.get('/api/status', (req, res) => {
-    const status = monitoring.getStatus();
-    res.json(status);
+app.get('/status', (req, res) => {
+    res.render('status');
 });
 
 app.listen(PORT, () => {

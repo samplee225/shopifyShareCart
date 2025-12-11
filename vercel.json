@@ -6,21 +6,18 @@
       "use": "@vercel/node"
     },
     {
-      "src": "api/**/*.js",
+      "src": "api/status.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/status",
+      "dest": "/api/status.js"
     },
     {
       "src": "/(.*)",
       "dest": "/index.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
