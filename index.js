@@ -1,12 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const routes = require('./Routes/Route');
 const connectDB = require('./services/connection');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const VercelServerMonitoring = require('./services/vercelMonitoring');
 
 const app = express();
-dotenv.config();
 const monitoring = new VercelServerMonitoring();
 
 connectDB;
