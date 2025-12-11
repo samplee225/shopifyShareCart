@@ -3,11 +3,11 @@ const routes = require('./Routes/Route');
 const connectDB = require('./services/connection');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const ServerMonitoring = require('./services/monitoring');
+const VercelServerMonitoring = require('./services/vercelMonitoring');
 
 const app = express();
 dotenv.config();
-const monitoring = new ServerMonitoring();
+const monitoring = new VercelServerMonitoring();
 
 connectDB;
 app.use(cors());
@@ -27,6 +27,11 @@ app.use((req, res, next) => {
         if (res.statusCode >= 400) {
             monitoring.recordError();
         }
+
+        // Persist metrics to database every 10 requests (Vercel optimization)
+        if (Math.random() < 0.1) {
+            monitoring.persistMetrics().catch(err => console.error('Metrics persist error:', err));
+        }
     });
 
     next();
@@ -36,9 +41,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use('/api', routes);
 
-// Status routes
-app.get('/status', (req, res) => {
-    res.render('status');
+app.get('/api/status', async (req, res) => {
+    try {
+        const status = await monitoring.getStatus();
+        res.json(status);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve status' });
+    }
 });
 
 app.get('/api/status', (req, res) => {
