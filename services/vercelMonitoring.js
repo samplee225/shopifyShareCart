@@ -116,10 +116,29 @@ class VercelServerMonitoring {
             };
         } catch (error) {
             console.error('Error getting status:', error);
+            const totalMem = os.totalmem();
+            const freeMem = os.freemem();
+            const usedMem = totalMem - freeMem;
+            const cpus = os.cpus();
+            const uptime = Date.now() - this.startTime;
+            
             return {
-                status: 'ERROR',
-                error: 'Failed to retrieve status',
-                timestamp: new Date().toISOString()
+                status: 'WARNING',
+                uptime,
+                uptimeFormatted: this.formatUptime(uptime),
+                totalMemory: (totalMem / 1024 / 1024 / 1024).toFixed(2),
+                usedMemory: (usedMem / 1024 / 1024 / 1024).toFixed(2),
+                freeMemory: (freeMem / 1024 / 1024 / 1024).toFixed(2),
+                memoryUsagePercent: ((usedMem / totalMem) * 100).toFixed(2),
+                cpuCount: cpus.length,
+                platform: os.platform(),
+                nodeVersion: process.version,
+                requestsTotal: this.requestCountLocal,
+                errorsTotal: this.errorCountLocal,
+                errorRate: this.requestCountLocal === 0 ? 0 : ((this.errorCountLocal / this.requestCountLocal) * 100).toFixed(2),
+                averageResponseTime: this.getAverageResponseTime(),
+                timestamp: new Date().toISOString(),
+                error: 'Failed to retrieve DB metrics, showing local metrics only'
             };
         }
     }

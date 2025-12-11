@@ -276,11 +276,29 @@
             const dashboard = document.getElementById('dashboard');
             const statusData = statusMap[data.status] || statusMap.HEALTHY;
 
+            // Provide default values for missing data
+            const safeData = {
+                status: data.status || 'UNKNOWN',
+                uptimeFormatted: data.uptimeFormatted || '0s',
+                memoryUsagePercent: data.memoryUsagePercent || 0,
+                usedMemory: data.usedMemory || '0',
+                totalMemory: data.totalMemory || '0',
+                requestsTotal: data.requestsTotal || 0,
+                errorRate: data.errorRate || 0,
+                errorsTotal: data.errorsTotal || 0,
+                averageResponseTime: data.averageResponseTime || 0,
+                cpuCount: data.cpuCount || 0,
+                platform: data.platform || 'Unknown',
+                nodeVersion: data.nodeVersion || 'Unknown',
+                freeMemory: data.freeMemory || '0',
+                timestamp: data.timestamp || new Date().toISOString()
+            };
+
             document.getElementById('statusBadge').innerHTML = `
                 <span style="color: ${statusData.class === 'healthy' ? '#10b981' : statusData.class === 'warning' ? '#f59e0b' : '#ef4444'}">
                     ${statusData.icon}
                 </span>
-                ${data.status}
+                ${safeData.status}
             `;
             document.getElementById('statusBadge').className = `status-badge ${statusData.class}`;
 
@@ -290,7 +308,7 @@
                         <span class="card-title">Uptime</span>
                         <span class="card-icon">⏱️</span>
                     </div>
-                    <div class="card-value">${data.uptimeFormatted}</div>
+                    <div class="card-value">${safeData.uptimeFormatted}</div>
                     <div class="card-subtitle">System running</div>
                 </div>
 
@@ -299,12 +317,12 @@
                         <span class="card-title">Memory Usage</span>
                         <span class="card-icon">💾</span>
                     </div>
-                    <div class="card-value">${data.memoryUsagePercent}%</div>
+                    <div class="card-value">${safeData.memoryUsagePercent}%</div>
                     <div class="progress-bar">
-                        <div class="progress-fill ${getProgressClass(data.memoryUsagePercent, {low: 50, medium: 75})}
-                             " style="width: ${data.memoryUsagePercent}%"></div>
+                        <div class="progress-fill ${getProgressClass(safeData.memoryUsagePercent, {low: 50, medium: 75})}
+                             " style="width: ${safeData.memoryUsagePercent}%"></div>
                     </div>
-                    <div class="card-subtitle">${data.usedMemory}GB / ${data.totalMemory}GB</div>
+                    <div class="card-subtitle">${safeData.usedMemory}GB / ${safeData.totalMemory}GB</div>
                 </div>
 
                 <div class="card">
@@ -312,7 +330,7 @@
                         <span class="card-title">Total Requests</span>
                         <span class="card-icon">📊</span>
                     </div>
-                    <div class="card-value">${data.requestsTotal.toLocaleString()}</div>
+                    <div class="card-value">${(safeData.requestsTotal || 0).toLocaleString()}</div>
                     <div class="card-subtitle">API calls processed</div>
                 </div>
 
@@ -321,12 +339,12 @@
                         <span class="card-title">Error Rate</span>
                         <span class="card-icon">⚠️</span>
                     </div>
-                    <div class="card-value">${data.errorRate}%</div>
+                    <div class="card-value">${safeData.errorRate}%</div>
                     <div class="progress-bar">
-                        <div class="progress-fill ${getProgressClass(data.errorRate, {low: 1, medium: 5})}
-                             " style="width: ${Math.min(data.errorRate * 10, 100)}%"></div>
+                        <div class="progress-fill ${getProgressClass(safeData.errorRate, {low: 1, medium: 5})}
+                             " style="width: ${Math.min(safeData.errorRate * 10, 100)}%"></div>
                     </div>
-                    <div class="card-subtitle">${data.errorsTotal} errors</div>
+                    <div class="card-subtitle">${safeData.errorsTotal} errors</div>
                 </div>
 
                 <div class="card">
@@ -334,7 +352,7 @@
                         <span class="card-title">Avg Response Time</span>
                         <span class="card-icon">⚡</span>
                     </div>
-                    <div class="card-value">${data.averageResponseTime}ms</div>
+                    <div class="card-value">${safeData.averageResponseTime}ms</div>
                     <div class="card-subtitle">Request latency</div>
                 </div>
 
@@ -343,7 +361,7 @@
                         <span class="card-title">CPU Cores</span>
                         <span class="card-icon">🖥️</span>
                     </div>
-                    <div class="card-value">${data.cpuCount}</div>
+                    <div class="card-value">${safeData.cpuCount}</div>
                     <div class="card-subtitle">Available processors</div>
                 </div>
 
@@ -355,19 +373,19 @@
                     <div class="metrics-grid">
                         <div class="metric">
                             <span class="metric-label">Platform</span>
-                            <span class="metric-value">${data.platform}</span>
+                            <span class="metric-value">${safeData.platform}</span>
                         </div>
                         <div class="metric">
                             <span class="metric-label">Node Version</span>
-                            <span class="metric-value">${data.nodeVersion}</span>
+                            <span class="metric-value">${safeData.nodeVersion}</span>
                         </div>
                         <div class="metric">
                             <span class="metric-label">Free Memory</span>
-                            <span class="metric-value">${data.freeMemory}GB</span>
+                            <span class="metric-value">${safeData.freeMemory}GB</span>
                         </div>
                         <div class="metric">
                             <span class="metric-label">Timestamp</span>
-                            <span class="metric-value">${new Date(data.timestamp).toLocaleTimeString()}</span>
+                            <span class="metric-value">${new Date(safeData.timestamp).toLocaleTimeString()}</span>
                         </div>
                     </div>
                 </div>
